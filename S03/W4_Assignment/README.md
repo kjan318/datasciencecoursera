@@ -19,3 +19,14 @@ d. Analysis R Script does the following.
 ```
 
 ### Review Criteria
+
+#### Task lists
+ 
+ | Deliverables  | Item          | Link to Item  |
+ | ------------- | ------------- | ------------- |
+ | Analysis R Script | run_analysis.R | [R script Link](https://github.com/kjan318/datasciencecoursera/blob/master/S03/W4_Assignment/run_analysis.R) |
+ | Tidy Data Set  | Clean Data set  | [Data Set Link](https://github.com/kjan318/datasciencecoursera/blob/master/S03/W4_Assignment/output/tidyData.txt)|
+ | GitHub Repo | Repo | [Project Link](https://github.com/kjan318/datasciencecoursera/tree/master/S03/W4_Assignment) |
+ | CodeBook | CodeBook.md | [CodeBook Link](https://github.com/kjan318/datasciencecoursera/blob/master/S03/W4_Assignment/CodeBook.md) |
+ | ReadMe | README.md | [README Link](https://github.com/kjan318/datasciencecoursera/blob/master/S03/W4_Assignment/README.md)|
+
