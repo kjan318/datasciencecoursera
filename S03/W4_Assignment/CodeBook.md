@@ -1,4 +1,4 @@
-## Getting and Cleaning Data Project
+## Peer-graded Assignment: Getting and Cleaning Data Project
 
 Created by: Kieso Jan
 
