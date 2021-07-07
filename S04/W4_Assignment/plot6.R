@@ -41,6 +41,7 @@ png("plot6.png")
 
 ggplot(NEIbaltimore_LA_motorV,aes(x = factor(year),y = Total_Emissions, fill=city)) +
   geom_bar(aes(fill=year),stat="identity") +
+  theme(legend.position = "right") +
   facet_grid(.~city,scales = "free",space="free") + 
   labs(x="year", y=expression("Total PM"[2.5]*" Emission (Tons)")) + 
   labs(title=expression("1999 to 2008 : PM"[2.5]*" Emissions, Baltimore VS LA Motor Vehicle Source"))
