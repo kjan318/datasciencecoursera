@@ -2,7 +2,6 @@ library(dplyr)
 library(ggplot2)
 
 
-
 ## Loading data from .rds files
 setwd("S04/W4_Assignment/")
 
@@ -27,7 +26,7 @@ LA_baltimoreNEI <- rbind(baltimoreNEI,LANEI)
 table(LA_baltimoreNEI$city)
 
 
-# to Join Baltimore City data source with SCC id relates to motor vehicle sources
+# to Join Baltimore City & LA data source with SCC id relates to motor vehicle sources
 LA_baltimoreSCC <- inner_join(motorV_SCC, LA_baltimoreNEI, by = "SCC")
 
 # calculate total motor vehicle sources Emission of Baltimore City & LA by different year (1999 to 2008)
