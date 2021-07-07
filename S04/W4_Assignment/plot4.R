@@ -32,3 +32,21 @@ ggplot(coalcombustionNEI,aes(x = factor(year),y = Emissions/10^5)) +
   labs(title=expression("1999-2008 : PM"[2.5]*" Coal Combustion Source Emissions Across US"))
 
 dev.off()
+
+
+# CLEAN UP #################################################
+
+# Clear data
+rm(list = ls())  # Removes all objects from environment
+
+# Clear packages
+detach("package:datasets", unload = T)  # For base packages
+p_unload(all)  # Remove all contributed packages
+
+# Clear plots
+graphics.off()  # Clears plots, closes all graphics devices
+
+# Clear console
+cat("\014")  # Mimics ctrl+L
+
+# Clear mind :)

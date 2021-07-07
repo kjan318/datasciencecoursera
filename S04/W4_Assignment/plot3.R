@@ -30,3 +30,21 @@ ggplot(baltimoreNEI,aes(factor(year),Emissions,fill=type)) +
 
 
 dev.off()
+
+
+# CLEAN UP #################################################
+
+# Clear data
+rm(list = ls())  # Removes all objects from environment
+
+# Clear packages
+detach("package:datasets", unload = T)  # For base packages
+p_unload(all)  # Remove all contributed packages
+
+# Clear plots
+graphics.off()  # Clears plots, closes all graphics devices
+
+# Clear console
+cat("\014")  # Mimics ctrl+L
+
+# Clear mind :)
