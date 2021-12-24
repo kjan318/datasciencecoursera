@@ -14,4 +14,6 @@ The test data are available [here](https://d396qusza40orc.cloudfront.net/predmac
 ## Review criteria
   1. Your submission for the Peer Review portion should consist of a link to a Github repo with your R markdown and compiled HTML file describing your analysis. Please constrain the text of the writeup to < 2000 words and the number of figures to be less than 5. It will make it easier for the graders if you submit a repo with a gh-pages branch so the HTML page can be viewed online (and you always want to make it easy on graders :-).
   2. Apply your machine learning algorithm to the 20 test cases available in the test data above and submit your predictions in appropriate format to the Course Project Prediction Quiz for automated grading.
-  3.
+ 
+ ## Assignment result (HTML Format)
+ Please click [here](https://htmlpreview.github.io/?https://github.com/kjan318/datasciencecoursera/blob/master/S08/W4_Assignment.html)   
