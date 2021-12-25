@@ -1,36 +1,48 @@
 ---
-title: "W4_Assignment: Predicting Exercise Classe from Wearable Devices"
+title: "S08_W4_Assignment: Classe prediction based on different devices"
 author: "Kieso Jan"
 date: "12/24/2021"
 output: html_document
 ---
 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
 ```
 
-## Instructions
-Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it.
+## Assignment Instructions
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. 
+These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it.
 
-In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website [ here](http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har) (see the section on the Weight Lifting Exercise Dataset).  
-The goal of your project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set. You may use any of the other variables to predict with. You should create a report describing how you built your model, how you used cross validation, what you think the expected out of sample error is, and why you made the choices you did. You will also use your prediction model to predict 20 different test cases.
+In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. 
+They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website [ here](http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har) (see the section on the Weight Lifting Exercise Dataset).
+
+## Goal to achieve for this Assignment
+a. The goal of your project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set. You may use any of the other variables to predict with. 
+b. You should create a report describing how you built your model, how you used cross validation, what you think the expected out of sample error is, and why you made the choices you did. 
+c. You will also use your prediction model to predict 20 different test cases.
 
 
-## Data
+## Data Source
 The training data for this project are available [here](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv)  
 The test data are available [here](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv)
 
 
 ## Review criteria
-  1. Your submission for the Peer Review portion should consist of a link to a Github repo with your R markdown and compiled HTML file describing your analysis. Please constrain the text of the writeup to < 2000 words and the number of figures to be less than 5. It will make it easier for the graders if you submit a repo with a gh-pages branch so the HTML page can be viewed online (and you always want to make it easy on graders :-).
-  2. Apply your machine learning algorithm to the 20 test cases available in the test data above and submit your predictions in appropriate format to the Course Project Prediction Quiz for automated grading.
+  a. Your submission for the Peer Review portion should consist of a link to a Github repo with your R markdown and compiled HTML file describing your analysis. 
+     Please constrain the text of the writeup to < 2000 words and the number of figures to be less than 5. It will make it easier for the graders if you submit a repo with a gh-pages branch so the HTML page can be viewed online (and you always want to make it easy on graders :-).
+  b. Apply your machine learning algorithm to the 20 test cases available in the test data above and submit your predictions in appropriate format to the Course Project Prediction Quiz for automated grading.
 
-## Analysis
-### Environment setup
+
+## Analysis Process
+### To setup Environment 
+
 ```{r}
+#loading required library "caret" & "randomForest"
 library(caret)
 library(randomForest)
 
+# download data source directly if not exist in working folder
 if (!file.exists('train.csv')) {
   download.file(url = 'https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv', 
                 destfile = 'train.csv', method = 'curl', quiet = TRUE) 
@@ -39,100 +51,103 @@ if (!file.exists('test.csv')) {
   download.file(url = 'https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv', 
                 destfile = 'test.csv', method = 'curl', quiet = TRUE)
 }
+
+# read train & test source
 trainRaw <- read.csv('train.csv')
 testRaw <- read.csv('test.csv')
+
 ```
 
-### Preprocessing
-1. First look at the data for each column and remove variables unrelated to exercise (column number and time stamps)
-```{r}
-str(trainRaw)
 
+### pre-work
+1. Data Exploration: Walk through each column of source data and keep exercise related variables
+```{r}
+str(trainRaw, strict.width = "wrap")
 train <- trainRaw[, 6:ncol(trainRaw)]
 
 ```
-
-2. Split the data into 70% training and 30% testing set
+2. Create training and validation set by 80/20 proportion from train source
 ```{r}
+# setting seed to ensure the same result can be reproduced 
 set.seed(9999)
-inTrain <- createDataPartition(y = train$classe, p = 0.7, list = F)
+inTrain <- createDataPartition(y = train$classe, p = 0.8, list = F)
 training <- train[inTrain, ]
-testing <- train[-inTrain, ]
+validation <- train[-inTrain, ]
 
 ```
 
-3. Remove the variables with a lot of similarities
+3. Drop the variables in Tran set with a lot of similarities 
+Remove variable contains many variables and many of these variables have extremely low variances. (means that there is very little information in these variables due to they mostly consist of a single value (e.g. zero).)
 ```{r}
 
-nzv <- nearZeroVar(train, saveMetrics = T)
-keepFeat <- row.names(nzv[nzv$nzv == FALSE, ])
-training <- training[, keepFeat]
+feature_variance <- nearZeroVar(train, saveMetrics = T)
+featureToKeep <- row.names(feature_variance[feature_variance$nzv == FALSE, ])
+training <- training[, featureToKeep]
 
-```
-
-4. Remove the variables with all NAs
-```{r}
-training <- training[, colSums(is.na(training)) == 0]
 dim(training)
 ```
-This is a rather stringent cutoff but there is still >50 features after removal
-
-### Model training
-1. Set up 5-fold cross validation for training
+4. Drop the variables in Train set with value are all NAs
 ```{r}
+# only keep columns without missing value
+training <- training[, colSums(is.na(training)) == 0]
+# showing how many variables keep
+dim(training)
+```
+The remained variables are still >50 (54 remains actually) after removal after above 2 steps
 
-modCtl <- trainControl(method = 'cv', number = 5)
-
+### Model building process
+1. To create 5-fold Cross Validation for training
+```{r}
+modelctl <- trainControl(method="cv", number=5)
 ```
 
-2. Fit a model with random forests
+2. Fit our 1st model with random forests
 ```{r}
 
+# setting seed to ensure the same result can be reproduced 
 set.seed(8888)
-modRf <- train(classe ~. , data = training, method = 'rf', trControl = modCtl)
-
+model_Rf <- train(classe ~. , data = training, method = 'rf', trControl = modelctl)
 ```
-- Read the summary of the model built with random forests
+
+```{r}
+model_Rf$finalModel
+```
+- Using the validation set to predict and check the accuracy by confusion matrix
 ```{r}
 
-modRf$finalModel
-
+predRf <- predict(model_Rf, newdata = validation)
+confusionMatrix(predRf, as.factor(validation$classe))$table
+confusionMatrix(predRf, as.factor(validation$classe))$overall[1]
 ```
-- Predict with the validation set and check the confusion matrix and accuracy
-```{r}
+The prediction result is approx. 99.8% accuracy based on 5-fold cross validation
 
-predRf <- predict(modRf, newdata = testing)
-confusionMatrix(predRf, as.factor(testing$classe))$table
-confusionMatrix(predRf, as.factor(testing$classe))$overall[1]
+3. Fit another model with gradient boosting method for comparison
+```{r}
+model_gbm <- train(classe ~., data = training, method = 'gbm', trControl = modelctl, verbose = F)
+```
 
+```{r}
+model_gbm$finalModel
 ```
-The accuracy is ~99.8% under 5-fold cross validation
 
-3. Fit a model with gradient boosting method
+- Using the validation set to predict and check the accuracy by confusion matrix
 ```{r}
-modGbm <- train(classe ~., data = training, method = 'gbm', trControl = modCtl, verbose = F)
+predgbm <- predict(model_gbm, newdata = validation)
+confusionMatrix(predgbm, as.factor(validation$classe))$table
+confusionMatrix(predgbm, as.factor(validation$classe))$overall[1]
 ```
-- Read the summary of the model built with gbm
-```{r}
-modGbm$finalModel
-```
-- Predict with the validation set and check the confusion matrix and accuracy
-```{r}
-predGbm <- predict(modGbm, newdata = testing)
-confusionMatrix(predGbm, as.factor(testing$classe))$table
-confusionMatrix(predGbm, as.factor(testing$classe))$overall[1]
-```
-The accuracy is ~98.5% under 5-fold cross validation
+The prediction result is approx. 99.2% accuracy based on 5-fold cross validation
 
-## Quiz
-Since random forests gives the highest accuracy under the validation set, this model will be selected and used for prediction in the test set
+## To Answer the Questions
+Due to the highest accuracy via the validation set is from random forests, the model is selected for the test set prediction
 ```{r}
-predRfTest <- predict(modRf, newdata = testRaw)
+predRfTest <- predict(model_Rf, newdata = testRaw)
 predRfTest
 ```
-The gbm model can also be used for prediction and the results can be compared to above
+Further action: since the accuracy from gbm model is also high, let's use it to predict as well and cross check with the prediction from random forests
+
 ```{r}
-predGbmTest <- predict(modGbm, newdata = testRaw)
+predGbmTest <- predict(model_gbm, newdata = testRaw)
 table(predRfTest, predGbmTest)
 ```
-The two models produce the same results, as shown in the confusion matrix above
+The result shows there're no prediction difference, meaning either random forests or gradient boosting can all produce same prediction results.
